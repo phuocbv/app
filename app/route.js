@@ -49,6 +49,14 @@ module.exports = (app, passport) => {
         req.logout();
         res.redirect('/');
     });
+
+    app.get('/auth/facebook', passport.authenticate('facebook-login'), (req, res) => {
+        res.send('ok');
+    });
+
+    app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), (req, res) => {
+        res.redirect('/account');
+    });
 };
 
 // check login

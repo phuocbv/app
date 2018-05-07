@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-var port = process.env.PORT || 8000;
+var port = process.env.PORT || 3000;
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var passport = require('passport');
@@ -11,7 +11,7 @@ mongoose.connect(configDB.url);
 require('./config/passport')(passport);
 
 app.use(session({
-    secret: 'eminem', // session secret
+    secret: 'eminem',
     resave: true,
     saveUninitialized: true
 }));

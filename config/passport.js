@@ -1,6 +1,8 @@
 var LocalStrategy = require('passport-local').Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy;
 var User = require('../app/model/user');
 var bcrypt = require('bcrypt-nodejs');
+var social = require('./social');
 
 module.exports = (passport) => {
 
@@ -9,9 +11,10 @@ module.exports = (passport) => {
     });
 
     passport.deserializeUser(function(id, done) {
-        User.findById(id, function(err, user) {
-            done(err, user);
-        });
+        // User.findById(id, function(err, user) {
+        //     done(err, user);
+        // });
+        done(null, id);
     });
 
     passport.use('local-login', new LocalStrategy(
@@ -46,4 +49,14 @@ module.exports = (passport) => {
             });
         }
     ));
+
+    passport.use('facebook-login', new FacebookStrategy({
+        clientID: social.facebook.client_id,
+        clientSecret: social.facebook.client_secret,
+        callbackURL: social.facebook.callbackURL
+    }, (accessToken, refreshToken, profile, done) => {
+        //done(null, {accessToken: accessToken, profile: profile});
+        console.log(accessToken);
+        console.log(profile);
+    }));
 }
