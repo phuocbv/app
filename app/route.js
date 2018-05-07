@@ -1,4 +1,26 @@
+var HistoryAccess = require('./model/history-access');
+
+// check login
+function isLoggedIn(req, res, next) {
+    console.log(req.isAuthenticated());
+    console.log(req.user);
+    if (req.isAuthenticated()) {
+        // var history = new HistoryAccess();
+        // history.userID = req.user.id;
+        // history.url = req.url;
+        // history.time = Date.now();
+        // history.save((err) => {
+        //     if (err) throw err;
+        //     return next();
+        // });
+        return next();
+    }
+    res.redirect('/');
+}
+
 module.exports = (app, passport) => {
+    //app.use(isLoggedIn);
+
     // =====================================
     // Trang chủ (có các url login) ========
     // =====================================
@@ -38,7 +60,7 @@ module.exports = (app, passport) => {
     // =====================================
     // Thông tin user đăng ký =====================
     // =====================================
-    app.get('/profile', (req, res) => {
+    app.get('/profile', isLoggedIn, (req, res) => {
         res.send('profile');
     });
 
@@ -50,19 +72,28 @@ module.exports = (app, passport) => {
         res.redirect('/');
     });
 
-    app.get('/auth/facebook', passport.authenticate('facebook-login'), (req, res) => {
-        res.send('ok');
-    });
+    // =====================================
+    // FACEBOOK ROUTES =====================
+    // =====================================
+    app.get('/auth/facebook', passport.authenticate('facebook-login', {
+        scope: ['public_profile', 'email']
+    }));
 
-    app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), (req, res) => {
-        res.redirect('/account');
-    });
+    app.get('/auth/facebook/callback', passport.authenticate('facebook-login', {
+        successRedirect: '/profile',
+        failureRedirect: '/login',
+    }));
+
+    // =====================================
+    // GOOGLE ROUTES =======================
+    // =====================================
+    app.get('/auth/google', passport.authenticate('google-login', {
+        scope: ['profile', 'email']
+    }));
+
+    // the callback after google has authenticated the user
+    app.get('/auth/google/callback', passport.authenticate('google-login', {
+        successRedirect: '/profile',
+        failureRedirect: '/login',
+    }));
 };
-
-// check login
-function isLoggedIn(req, res, next) {
-    console.log(req.isAuthenticated());
-    if (req.isAuthenticated())
-        return next();
-    res.redirect('/');
-}
