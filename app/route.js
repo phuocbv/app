@@ -1,39 +1,28 @@
-var HistoryAccess = require('./model/history-access');
-var mongoose = require('mongoose');
-var configDB = require('../config/database');
+var func = require('./helper/func');
+// // check login
+// function isLoggedIn(req, res, next) {
+//     if (req.isAuthenticated()) {
+//         return next();
+//     }
+//     res.redirect('/');
+// }
 
-var conn = mongoose.connection;
-
-// check login
-function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect('/');
-}
-
-//save history
-function saveHistory(req, res, next) {
-    if (req.isAuthenticated()) {
-        var history = {
-                userID: req.user,
-                time: Date.now(),
-                url: req.url,
-                // count: 
-            }
-            // HistoryAccess.find({ 'url': req.url }, (err, result) => {
-            //     console.log(result);
-            //     if (result) {
-
-        //     }
-        // });
-        conn.collection(configDB.collections.historyAccess).insert(history);
-    }
-    return next();
-}
+// //save history
+// function saveHistory(req, res, next) {
+//     if (req.isAuthenticated()) {
+//         var history = {
+//             userID: req.user,
+//             time: Date.now(),
+//             url: req.url,
+//             // count: 
+//         }
+//         conn.collection(configDB.collections.historyAccess).insert(history);
+//     }
+//     return next();
+// }
 
 module.exports = (app, passport) => {
-    app.use(saveHistory);
+    app.use(func.saveHistory);
 
     // =====================================
     // Trang chủ (có các url login) ========
@@ -74,7 +63,7 @@ module.exports = (app, passport) => {
     // =====================================
     // Thông tin user đăng ký =====================
     // =====================================
-    app.get('/profile', isLoggedIn, (req, res) => {
+    app.get('/profile', func.isLoggedIn, (req, res) => {
         res.send('profile');
     });
 
