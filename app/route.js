@@ -1,25 +1,39 @@
 var HistoryAccess = require('./model/history-access');
+var mongoose = require('mongoose');
+var configDB = require('../config/database');
+
+var conn = mongoose.connection;
 
 // check login
 function isLoggedIn(req, res, next) {
-    console.log(req.isAuthenticated());
-    console.log(req.user);
     if (req.isAuthenticated()) {
-        // var history = new HistoryAccess();
-        // history.userID = req.user.id;
-        // history.url = req.url;
-        // history.time = Date.now();
-        // history.save((err) => {
-        //     if (err) throw err;
-        //     return next();
-        // });
         return next();
     }
     res.redirect('/');
 }
 
+//save history
+function saveHistory(req, res, next) {
+    if (req.isAuthenticated()) {
+        var history = {
+                userID: req.user,
+                time: Date.now(),
+                url: req.url,
+                // count: 
+            }
+            // HistoryAccess.find({ 'url': req.url }, (err, result) => {
+            //     console.log(result);
+            //     if (result) {
+
+        //     }
+        // });
+        conn.collection(configDB.collections.historyAccess).insert(history);
+    }
+    return next();
+}
+
 module.exports = (app, passport) => {
-    //app.use(isLoggedIn);
+    app.use(saveHistory);
 
     // =====================================
     // Trang chủ (có các url login) ========
